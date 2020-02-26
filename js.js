@@ -61,7 +61,6 @@ function Display(){
       for(let col=0; col < 2; col++){
         push()
         stroke(255)
-        if(this.states[row][col]) noStroke();
         fill(89, 201, 165, this.states[row][col] * 255)
         ellipse(this.x * col, this.y * row+this.y, 20)
         let index = row + col * this.states.length + 1
