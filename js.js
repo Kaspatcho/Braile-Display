@@ -1,44 +1,51 @@
-let display
-const letters = [0x1, 0x3, 0x9, 0x19, 0x11, 0xb, 0x1b,
-                 0x13, 0xa, 0x1a, 0x5, 0x7, 0xd, 0x1d,
-                 0x15, 0xf, 0x1f, 0x17, 0xe, 0x1e, 0x25,
-                 0x27, 0x3a, 0x2d, 0x3d, 0x35]
-
-const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h",
-                  "i", "j", "k", "l", "m", "n", "o",
-                  "p", "q", "r", "s", "t", "u", "v",
-                  "w", "x", "y", "z"]
+let displays = []
+const input = document.querySelector("input")
+const letters = [["a", 0x1], ["b", 0x3], ["c", 0x9], ["d", 0x19], ["e", 0x11],
+                 ["f", 0xb], ["g", 0x1b], ["h", 0x13], ["i", 0xa], ["j", 0x1a],
+                 ["k", 0x5], ["l", 0x7], ["m", 0xd], ["n", 0x1d], ["o", 0x15],
+                 ["p", 0xf], ["q", 0x1f], ["r", 0x17], ["s", 0xe], ["t", 0x1e],
+                 ["u", 0x25], ["v", 0x27], ["w", 0x3a], ["x", 0x2d], ["y", 0x3d],
+                 ["z", 0x35]]
 let index = 0
+const maxLength = 16
 
 function setup(){
  createCanvas(600, 600)
- display = new Display()
+ for(let i=0; i < maxLength; i++){
+   displays.push(new Display())
+ }
+ input.maxLength = maxLength
 }
 
 function draw(){
   background("#37323E")
-  scale(7)
-  display.draw()
-  push()
-  textSize(20)
-  fill(255)
-  text(alphabet[index].toUpperCase(), 60, 50)
-  pop()
-  let binLetter = letters[index]
-  for(let row=0; row < 3; row++){
-    for(let col=0; col < 2; col++){
-      let i = row + col * display.states.length
-      display.setState(row, col, setLight(binLetter, i))
-    }
+  for(const i in displays){
+    push()
+    translate(displays[i].x * 3*i+20 < width ? displays[i].x * 3*i+20 : displays[i].x * 3*i - width + 20,
+      displays[i].x * 3*i+20 < width ? 0 : displays[i].y + 60)
+    displays[i].draw()
+    pop()
   }
 }
 
-function mousePressed(){
-  index = (index + 1) % letters.length
-}
+input.addEventListener("keyup", () => {
+  let text = input.value.split('')
+  let i;
+  for (i in text) {
+    let c = letters.findIndex(letter => letter[0] == text[i].toLowerCase())
+    displays[i].setLetter(c)
+  }
+  while(i < displays.length){
+    displays[i].setLetter(-1)
+    i++
+  }
+})
+
+
 
 function Display(){
-  let x = 20, y = 20
+  this.x = 20
+  this.y = 20
   this.states = [
     [0, 0],
     [0, 0],
@@ -50,11 +57,11 @@ function Display(){
         push()
         stroke(255)
         fill(89, 201, 165, this.states[row][col] * 255)
-        ellipse(x * col+x, y * row+y, 20)
+        ellipse(this.x * col, this.y * row+this.y, 20)
         let index = row + col * this.states.length + 1
         noStroke()
         fill(255)
-        text(index, x * col+x, y * row+y)
+        text(index, this.x * col, this.y * row+this.y)
         pop()
       }
     }
@@ -62,6 +69,16 @@ function Display(){
 
   this.setState = function(row, col, value){
     this.states[row][col] = value
+  }
+
+  this.setLetter = function(letter){
+    let binLetter = (letter >= 0) ? letters[letter][1] : 0
+    for(let row=0; row < 3; row++){
+      for(let col=0; col < 2; col++){
+        let i = row + col * this.states.length
+        this.setState(row, col, setLight(binLetter, i))
+      }
+    }
   }
 }
 

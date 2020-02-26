@@ -5,8 +5,14 @@
 
 canvas{
   position: absolute;
-  top: 30px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 20px;
+}
+
+input{
+  position: absolute;
+  top: 625px;
+  left: 45%;
 }
