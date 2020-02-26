@@ -7,22 +7,28 @@ const letters = [["a", 0x1], ["b", 0x3], ["c", 0x9], ["d", 0x19], ["e", 0x11],
                  ["u", 0x25], ["v", 0x27], ["w", 0x3a], ["x", 0x2d], ["y", 0x3d],
                  ["z", 0x35]]
 let index = 0
-const maxLength = 16
+const maxLength = 20
 
 function setup(){
- createCanvas(600, 600)
+ createCanvas(600, 200)
  for(let i=0; i < maxLength; i++){
    displays.push(new Display())
  }
  input.maxLength = maxLength
+ 
 }
 
 function draw(){
   background("#37323E")
+  push()
+  stroke(255, 150)
+  line(0, height/2 - 10, width, height/2 - 10)
+  pop()
+
   for(const i in displays){
     push()
     translate(displays[i].x * 3*i+20 < width ? displays[i].x * 3*i+20 : displays[i].x * 3*i - width + 20,
-      displays[i].x * 3*i+20 < width ? 0 : displays[i].y + 60)
+      displays[i].x * 3*i+20 < width ? 0 : displays[i].y + 80)
     displays[i].draw()
     pop()
   }
@@ -30,15 +36,14 @@ function draw(){
 
 input.addEventListener("keyup", () => {
   let text = input.value.split('')
-  let i;
-  for (i in text) {
+  for (var i in text) {
     let c = letters.findIndex(letter => letter[0] == text[i].toLowerCase())
     displays[i].setLetter(c)
   }
   while(i < displays.length){
-    displays[i].setLetter(-1)
-    i++
+    displays[++i].setLetter(-1)
   }
+  if(input.value == "") displays[0].setLetter(-1)
 })
 
 
@@ -56,12 +61,13 @@ function Display(){
       for(let col=0; col < 2; col++){
         push()
         stroke(255)
+        if(this.states[row][col]) noStroke();
         fill(89, 201, 165, this.states[row][col] * 255)
         ellipse(this.x * col, this.y * row+this.y, 20)
         let index = row + col * this.states.length + 1
         noStroke()
         fill(255)
-        text(index, this.x * col, this.y * row+this.y)
+        if(!this.states[row][col]) text(index, this.x * col, this.y * row+this.y)
         pop()
       }
     }
